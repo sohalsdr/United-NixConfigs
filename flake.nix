@@ -1,5 +1,5 @@
 {
-  description = "Your new nix config";
+  description = "In Nix We Trust.";
 
   inputs = {
     # Nixpkgs
@@ -8,9 +8,6 @@
     # Home manager
     home-manager.url = "github:nix-community/home-manager/release-23.11";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
-    
-    # TODO: Add any other flake you might need
-    # hardware.url = "github:nixos/nixos-hardware";
   };
 
   outputs = {
@@ -24,10 +21,10 @@
     # NixOS configuration entrypoint
     # Available through 'nixos-rebuild --flake .#your-hostname'
     nixosConfigurations = {
-      taipei-vm = nixpkgs.lib.nixosSystem {
+      taipei = nixpkgs.lib.nixosSystem {
         specialArgs = {inherit inputs outputs;};
-        # Host's default NixOS configuration
-        modules = [./hosts/taipei-vm];
+        # > Our main nixos configuration file <
+        modules = [./taipei/nixos/configuration.nix];
       };
     };
 
@@ -35,11 +32,11 @@
     # Available through 'home-manager --flake .#your-username@your-hostname'
     homeConfigurations = {
       # FIXME replace with your username@hostname
-      "your-username@your-hostname" = home-manager.lib.homeManagerConfiguration {
+      "human@taipei" = home-manager.lib.homeManagerConfiguration {
         pkgs = nixpkgs.legacyPackages.x86_64-linux; # Home-manager requires 'pkgs' instance
         extraSpecialArgs = {inherit inputs outputs;};
-        # User's home-manager configuration for the host
-        modules = [./home/human/taipei-vm.nix];
+        # > Our main home-manager configuration file <
+        modules = [./taipei/human/home.nix];
       };
     };
   };
