@@ -16,24 +16,14 @@
     # You can also split up your configuration and import pieces of it here:
     # ./users.nix
 
-    # Import your generated (nixos-generate-config) hardware configuration
+    # Import generated (nixos-generate-config) hardware configuration
     ./hardware-configuration.nix
   ];
 
   nixpkgs = {
-    # You can add overlays here
-    overlays = [
-      # If you want to use overlays exported from other flakes:
-      # neovim-nightly-overlay.overlays.default
-
-      # Or define it inline, for example:
-      # (final: prev: {
-      #   hi = final.hello.overrideAttrs (oldAttrs: {
-      #     patches = [ ./change-hello-to-hi.patch ];
-      #   });
-      # })
-    ];
-    # Configure your nixpkgs instance
+    # Overlays
+    overlays = [];
+    # Configure nixpkgs instance
     config = {
       # Disable if you don't want unfree packages
       allowUnfree = true;
@@ -57,22 +47,66 @@
     nixPath = lib.mapAttrsToList (n: _: "${n}=flake:${n}") flakeInputs;
   };
 
-  # FIXME: Add the rest of your current configuration
+  # Bootloader
+  boot.loader.systemd-boot.enable = true;
+  boot.loader.efi.canTouchEfiVariables = true;
+  boot.initrd.luks.devices."luks-083c15e7-3905-46a4-bab1-7a721d2f8671".device = "/dev/disk/by-uuid/083c15e7-3905-46a4-bab1-7a721d2f8671";
 
-  # TODO: Set your hostname
+  # Networking
+  networking.networkmanager.enable = true;
+
+  # TZ and Locale
+  time.timeZone = "America/New_York";
+  i18n.defaultLocale = "en_US.UTF-8";
+  i18n.extraLocaleSettings = {
+    LC_ADDRESS = "en_US.UTF-8";
+    LC_IDENTIFICATION = "en_US.UTF-8";
+    LC_MEASUREMENT = "en_US.UTF-8";
+    LC_MONETARY = "en_US.UTF-8";
+    LC_NAME = "en_US.UTF-8";
+    LC_NUMERIC = "en_US.UTF-8";
+    LC_PAPER = "en_US.UTF-8";
+    LC_TELEPHONE = "en_US.UTF-8";
+    LC_TIME = "en_US.UTF-8";
+  };
+
+  # X11
+  services.xserver.enable = true;
+  services.xserver = {
+    layout = "us";
+    xkbVariant = "";
+  };
+
+  # Pantheon DE
+  services.xserver.displayManager.lightdm.enable = true;
+  services.xserver.desktopManager.pantheon.enable = true;
+
+  # Sound with Pipewire
+  sound.enable = true;
+  hardware.pulseaudio.enable = false;
+  security.rtkit.enable = true;
+  services.pipewire = {
+    enable = true;
+    alsa.enable = true;
+    alsa.support32Bit = true;
+    pulse.enable = true;
+  };
+
+  # Printing with CUPS
+  services.printing.enable = true;
+
+  # Hostname
   networking.hostName = "taipei";
 
-  # TODO: Configure your system-wide user settings (groups, etc), add more users as needed.
+  System-wide user settings (groups, etc)
   users.users = {
-    # FIXME: Replace with your username
     human = {
-      # TODO: You can set an initial password for your user.
-      # If you do, you can skip setting a root password by passing '--no-root-passwd' to nixos-install.
-      # Be sure to change it (using passwd) after rebooting!
+      # Set an initial password for your user.
+      # Skip setting a root password by passing '--no-root-passwd' to nixos-install.
+      # Be sure to change (using passwd) after rebooting!
       initialPassword = "CHANGEME";
       isNormalUser = true;
-      # TODO: Be sure to add any other groups you need (such as networkmanager, audio, docker, etc)
-      extraGroups = ["wheel"];
+      extraGroups = ["networkmanager" "wheel"];
     };
   };
 
