@@ -98,13 +98,12 @@
   # Hostname
   networking.hostName = "taipei";
 
-  System-wide user settings (groups, etc)
+  # System-wide user settings (groups, etc)
   users.users = {
     human = {
       # Set an initial password for your user.
       # Skip setting a root password by passing '--no-root-passwd' to nixos-install.
       # Be sure to change (using passwd) after rebooting!
-      initialPassword = "CHANGEME";
       isNormalUser = true;
       extraGroups = ["networkmanager" "wheel"];
     };
